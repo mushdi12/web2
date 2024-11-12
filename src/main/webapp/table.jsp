@@ -1,19 +1,24 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="beans.DataList" %>
 <%@ page import="beans.RequestData" %>
-<%@ page import="java.time.LocalDateTime" %>
-<%@ page import="java.util.Date" %>
+<%@ page import="java.util.concurrent.CopyOnWriteArrayList" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="ru">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results of the check</title>
+    <title>Web.2 | 338790</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+
 <header>
     <div class="logo">ITMO</div>
     <div class="user-info">
+        <a href="https://github.com/mushdi12/web2">source code</a>
         <span>Bragin Roman Andreevich</span>
         <span class="isu">408319</span>
     </div>
@@ -23,8 +28,8 @@
     <div class="container">
         <section class="content">
             <h1>Results Table</h1>
-            <h2>Check results for point inclusion in the area</h2>
-            <% DataList data = (DataList) request.getSession().getAttribute("bean");
+            <%
+                DataList data = (DataList) request.getSession().getAttribute("bean");
                 if (data != null) {
             %>
             <div class="task-card">
@@ -40,26 +45,56 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <% for (RequestData requestData : data.getDataList()) { %>
+                    <%
+                        CopyOnWriteArrayList<RequestData> dataList = data.getDataList();
+                        int startIndex = (int) session.getAttribute("count");
+                        List<RequestData> subList;
+                        int count = 5;
+
+
+                        subList = dataList.stream()
+                                .skip(startIndex)
+                                .limit(count)
+                                .toList();
+
+
+                        if (!subList.isEmpty()) { %>
+                    <% for (RequestData requestData : subList) { %>
                     <tr>
-                        <td><%= new Date().toString() %></td>
-                        <td><%= requestData.getExecutionTime() %></td>
-                        <td><%= requestData.getX() %></td>
-                        <td><%= requestData.getY() %></td>
-                        <td><%= requestData.getR() %></td>
-                        <td><%= requestData.getVerdict() %></td>
+                        <td><% String startTime =requestData.getStartTime(); %>
+                            <%= startTime.substring(0, startTime.length() - 10) %>
+                        </td>
+                        <td><%= requestData.getExecutionTime() + " mlsec" %>
+                        </td>
+                        <td><%= requestData.getX() %>
+                        </td>
+                        <td><%= requestData.getY() %>
+                        </td>
+                        <td><%= requestData.getR() %>
+                        </td>
+                        <td><%= requestData.getVerdict() %>
+                        </td>
                     </tr>
                     <% } %>
+                    <% } %>
+                    <% } %>
+
                     </tbody>
 
                 </table>
-                <% }  %>
-                <button onclick="history.back();" class="back-button">Back</button>
-                
+
+                <div class="button-group">
+                    <button type="button" onclick="goTable(-5)" class="submit-button"> <</button>
+                    <button onclick="history.back();" class="submit-button">Back</button>
+                    <button type="button" onclick="goTable(+5)" class="submit-button"> ></button>
+                </div>
+
             </div>
+
 
         </section>
     </div>
 </main>
+<script src="scripts.js"></script>
 </body>
 </html>

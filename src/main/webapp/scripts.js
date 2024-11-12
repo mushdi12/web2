@@ -3,16 +3,12 @@ const ctx = canvas.getContext('2d');
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const scale = 28;
-const default_radius = 6;
-let selectedX = null;  // Хранение выбранного X через кнопки
-let selectedY = null;  // Хранение введенного Y
+let selectedX = null;
+let selectedY = null;
 let selectedR = null;
 
 window.onload = function () {
-    drawSquare(default_radius);
-    drawTriangle(default_radius);
-    drawCircle(default_radius);
-    drawAxes();
+    paint(1)
 }
 
 function drawAxes() {
@@ -93,82 +89,99 @@ function drawPoint(x, y) {
     ctx.closePath();
 }
 
-// Функция для установки значения X
 function setX(value) {
     selectedX = value;
 
-    // Обновляем все кнопки, чтобы они отобразили активное состояние
     const buttons = document.querySelectorAll('.color-button');
     buttons.forEach(button => {
-        button.classList.remove('active'); // Убираем класс active
+        button.classList.remove('active');
     });
 
-    // Добавляем класс active для выбранной кнопки
     event.target.classList.add('active');
 }
-document.getElementById("yInput").addEventListener("input", function() {
-    selectedY = this.value !== "" ? parseFloat(this.value) : null;
-});
 
 canvas.addEventListener('click', function(event) {
-    // Получаем координаты клика относительно canvas
     const rect = canvas.getBoundingClientRect();
     const xCanvas = (event.clientX - rect.left - centerX) / scale;
     const yCanvas = (centerY - (event.clientY - rect.top)) / scale;
 
-    // Если клик был на канвасе, передаем координаты
     selectedX = xCanvas.toFixed(2);
     selectedY = yCanvas.toFixed(2)
-    let selectedR = document.getElementById("rSelect").value;
-    sendHtml(selectedX, selectedY, selectedR)
-});
+    selectedR = document.getElementById("rSelect").value;
 
-function submitForm(xCanvas, yCanvas) {
-
-
-    // Используем значение X, полученное через клика (если оно есть), или через кнопки
-    let xValue = selectedX !== null ? selectedX : xCanvas;
-
-    // Используем значение Y, полученное с канваса (если оно есть), или через поле ввода
-    let yValue = selectedY !== null ? selectedY : yCanvas;
-
-    // Получаем значение R из селектора
-    let selectedR = document.getElementById("rSelect").value;
-
-    // Проверка на допустимые значения X и Y
-    if (xValue < -3 || xValue > 5) {
+    if (selectedX < -3 || selectedX > 5) {
         alert("X должен быть в пределах от -3 до 5");
         return;
     }
 
-    if (yValue < -5 || yValue > 5) {
+    if (selectedY < -5 || selectedY > 5) {
+        alert("Y должен быть в пределах от -5 до 5");
+        return;
+    }
+    sendHTTP(selectedX, selectedY, selectedR)
+    drawPoint(selectedX, selectedY);
+});
+
+document.getElementById("rSelect").addEventListener("change", function() {
+    selectedR = this.value;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    paint(selectedR);
+
+});
+
+
+function submitForm() {
+
+    selectedY = document.getElementById("yInput").value;
+    selectedR = document.getElementById("rSelect").value;
+
+    if (selectedX < -3 || selectedX > 5) {
+        alert("X должен быть в пределах от -3 до 5");
+        return;
+    }
+
+    if (selectedY < -5 || selectedY > 5) {
         alert("Y должен быть в пределах от -5 до 5");
         return;
     }
 
-    xValue = parseFloat(xValue).toFixed(2);
-    yValue = parseFloat(yValue).toFixed(2);
+    selectedX = parseFloat(selectedX).toFixed(2);
+    selectedY = parseFloat(selectedY).toFixed(2);
 
-    // Проверяем, что все значения заданы
-    if (xValue !== null && yValue !== null && selectedR !== "") {
+    if (selectedX !== null && selectedY !== null && selectedR !== "") {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        sendHtml(xValue, yValue, selectedR);
-        drawSquare(selectedR);
-        drawCircle(selectedR);
-        drawTriangle(selectedR);
-        drawAxes();
-        drawPoint(xValue, yValue);
+        sendHTTP(selectedX, selectedY, selectedR);
+        paint(selectedR);
+        drawPoint(selectedX, selectedY);
     } else {
         alert("Please fill all fields correctly");
     }
 }
 
-function sendHtml(x, y, r) {
-    let time = currentTime.toLocaleTimeString();
+function sendHTTP(x, y, r) {
+    let currentTime = new Date();
+
+// Получаем время в формате HH:mm:ss
+    let time = currentTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+
+// Получаем миллисекунды
+    let milliseconds = currentTime.getMilliseconds();
+
+// Симулируем наносекунды, добавляя дополнительные нули
+    let nanoSeconds = currentTime.getMilliseconds() * 1000000; // преобразуем миллисекунды в наносекунды (1 миллисекунда = 1,000,000 наносекунд)
+    let nanoSecondsStr = nanoSeconds.toString().padStart(9, '0'); // Паддинг до 9 цифр
+
+// Формируем итоговую строку с наносекундами
+    let timeWithNanoSeconds = `${time}.${nanoSecondsStr}`;
     $.ajax({
         type: "POST",
         url: "controller",
-        data: { x: x, y: y, r: r, start_time: time, verdict: "Miss"},
+        data: { x: x, y: y, r: r, start_time: timeWithNanoSeconds, verdict: "Miss"},
         success: function() {
             console.log("Данные пришли")
         },
@@ -179,23 +192,19 @@ function sendHtml(x, y, r) {
         }
     });
 }
-function resetX() {
-    // Сбрасываем значение X
-    selectedX = null;
-
-    // Убираем класс active у всех кнопок
-    const buttons = document.querySelectorAll('.color-button');
-    buttons.forEach(button => {
-        button.classList.remove('active'); // Убираем класс active
-    });
-}
-
 
 function goTable(count) {
-
-    window.location.href = 'controller'+ encodeURIComponent(count);
+    window.location.href = `controller?count=${count}`;
 }
 
+function paint(r){
+
+    drawSquare(r);
+    drawCircle(r);
+    drawTriangle(r);
+    drawAxes();
+
+}
 
 
 

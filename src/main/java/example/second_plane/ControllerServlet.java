@@ -17,7 +17,7 @@ public class ControllerServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("table.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/areaCheck");
         dispatcher.include(request, response);
     }
 

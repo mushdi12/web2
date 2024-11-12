@@ -37,5 +37,4 @@ public class Validator {
         return x >= 0 && y <= 0 && y >= x - r/2;
     }
 
-
 }

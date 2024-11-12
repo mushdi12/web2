@@ -3,15 +3,18 @@ package beans;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 @Getter
 @Setter
-
 public class RequestData implements Serializable {
-    private static final long serialVersionUID = 1L;
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String startTime;
     private String executionTime;
     private String x;
     private String y;
@@ -19,7 +22,8 @@ public class RequestData implements Serializable {
     private String verdict;
 
 
-    public RequestData(String executionTime, String x, String y, String r, String verdict) {
+    public RequestData(String startTime, String executionTime, String x, String y, String r, String verdict) {
+        this.startTime = startTime;
         this.executionTime = executionTime;
         this.x = x;
         this.y = y;
@@ -30,7 +34,8 @@ public class RequestData implements Serializable {
     @Override
     public String toString() {
         return "RequestData{" +
-                "executionTime='" + executionTime + '\'' +
+                "startTime='" + startTime + '\'' +
+                ", executionTime='" + executionTime + '\'' +
                 ", x='" + x + '\'' +
                 ", y='" + y + '\'' +
                 ", r='" + r + '\'' +
