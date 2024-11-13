@@ -14,4 +14,8 @@ public class DataList implements Serializable {
         dataList.add(data);
     }
 
+    public void clearData() {
+        dataList.clear();
+    }
+
 }

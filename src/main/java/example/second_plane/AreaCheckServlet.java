@@ -52,12 +52,15 @@ public class AreaCheckServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         int count = Integer.parseInt(request.getParameter("count"));
+        if (count == 1) {
+            clearList(request);
+        }
         page_number+=count;
         System.out.println(count);
         System.out.println(page_number);
         if (page_number < 0) {
             page_number = 0;
-        }
+        } 
         HttpSession session = request.getSession();
         session.setAttribute("count",page_number);
         RequestDispatcher dispatcher = request.getRequestDispatcher("table.jsp");
@@ -82,6 +85,12 @@ public class AreaCheckServlet extends HttpServlet {
         long milliseconds = duration.toMillis();
         return String.valueOf(milliseconds);
 
+    }
+
+    private void clearList(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        DataList bean = (DataList) session.getAttribute("bean");
+        bean.clearData();
     }
 
 }

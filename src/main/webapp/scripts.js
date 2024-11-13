@@ -161,7 +161,6 @@ function submitForm() {
 function sendHTTP(x, y, r) {
     let currentTime = new Date();
 
-// Получаем время в формате HH:mm:ss
     let time = currentTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -169,14 +168,11 @@ function sendHTTP(x, y, r) {
         hour12: false
     });
 
-// Получаем миллисекунды
     let milliseconds = currentTime.getMilliseconds();
+    let nanoSeconds = currentTime.getMilliseconds() * 1000000;
+    let nanoSecondsStr = nanoSeconds.toString().padStart(9, '0');
 
-// Симулируем наносекунды, добавляя дополнительные нули
-    let nanoSeconds = currentTime.getMilliseconds() * 1000000; // преобразуем миллисекунды в наносекунды (1 миллисекунда = 1,000,000 наносекунд)
-    let nanoSecondsStr = nanoSeconds.toString().padStart(9, '0'); // Паддинг до 9 цифр
 
-// Формируем итоговую строку с наносекундами
     let timeWithNanoSeconds = `${time}.${nanoSecondsStr}`;
     $.ajax({
         type: "POST",

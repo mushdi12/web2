@@ -85,7 +85,9 @@
 
                 <div class="button-group">
                     <button type="button" onclick="goTable(-5)" class="submit-button"> <</button>
-                    <button onclick="history.back();" class="submit-button">Back</button>
+                    <button onclick="window.location.href='index.jsp';" class="submit-button">Back</button>
+                    <!-- <button onclick="history.back();" class="submit-button"Back</button> -->
+                    <button type="button" onclick="goTable(1)" class="submit-button">Clear</button>
                     <button type="button" onclick="goTable(+5)" class="submit-button"> ></button>
                 </div>
 
